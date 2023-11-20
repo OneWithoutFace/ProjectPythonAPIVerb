@@ -1,14 +1,37 @@
-import requests
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
+from controllers.verb_controller import fetch_verb
 
 verb = Blueprint("verb", __name__)
 
 # ENDPOINT 1 - GET A SINGLE VERB
 @verb.route("/verbs/", methods=["GET"])
 def get_single_verb():
-    pass
+    try:
+        token = validate_token()
+
+        data = json.loads(request.data)
+
+        if token == 400:
+            return jsonify({'error': "Token is missing in the request, please try again."}), 401
+        if token == 401:
+            return jsonify({'error': "Invalid authentication token, please login again."}), 403
+        
+        if 'verb' not in data:
+            return jsonify({'error': 'Verb is needed in the request.'}), 400
+        
+        verb = fetch_verb(data)
+
+        if verb == 'error':
+            return jsonify({'error': 'Request to Teacher API was unsuccessful'})
+        
+        return verb
+    
+    except Exception:
+        return jsonify({'error': 'Something went wrong when trying to fetch the verb.'}), 500
+    
+
 
 # ENDPOINT 2 - GET A RANDOM VERB
 @verb.route("/verbs/random/", methods=["GET"])
