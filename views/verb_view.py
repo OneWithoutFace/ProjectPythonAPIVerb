@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
-from controllers.verb_controller import fetch_verb
+from controllers.verb_controller import fetch_verb, fetch_random_verb
 
 verb = Blueprint("verb", __name__)
 
@@ -36,7 +36,29 @@ def get_single_verb():
 # ENDPOINT 2 - GET A RANDOM VERB
 @verb.route("/verbs/random/", methods=["GET"])
 def get_random_verb():
-    pass
+    try:
+        token = validate_token()
+
+        data = json.loads(request.data)
+
+        if token == 400:
+            return jsonify({'error': "Token is missing in the request, please try again."}), 401
+        if token == 401:
+            return jsonify({'error': "Invalid authentication token, please login again."}), 403
+        
+        if 'quantity' not in data:
+            return jsonify({'error': 'Quantity is needed in the request.'}), 400
+        
+        random_verb = fetch_random_verb(data)
+
+        if random_verb == 'error':
+            return jsonify({'error': 'Request to Teacher API was unsuccessful'}), 400
+        
+        return random_verb
+        
+    except Exception:
+        return jsonify({'error': 'Something went wrong when trying to fetch the verbs'}), 500
+
 
 # ENDPOINT 3 - ADD A FAVORITE VERB
 @verb.route("/verbs/favorites/", methods=["POST"])

@@ -32,4 +32,31 @@ def fetch_verb(verbInformation):
     
     except Exception as err:
         print("Error: ", err)
+
+# THIS IS FOR THE SECOND ENDPOINT
+def fetch_random_verb(verbInformation):
+    try:
+        quantity = verbInformation["quantity"]
+
+        external_api_url = 'https://lasalle-frenchverb-api-afpnl.ondigitalocean.app/v1/api/verb/random'
+        response = requests.get(
+            external_api_url, 
+            headers={
+                'token': '278ef2169b144e879aec4f48383dce28e654a009cacf46f8b6c03bbc9a4b9d11'
+            }, 
+            json={
+                'quantity': quantity
+            }
+        )
+        print(quantity)
+        if response.status_code == 200:
+            print(response.status_code)
+            return jsonify({'verbs': response.json()})
+        else:
+            print(response.status_code)
+            print(response.json())
+            return 'error'
+    
+    except Exception as err:
+        print('Error: ', err)
     
