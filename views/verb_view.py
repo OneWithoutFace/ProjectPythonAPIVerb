@@ -25,7 +25,7 @@ def get_single_verb():
             external_api_url = 'https://lasalle-frenchverb-api-afpnl.ondigitalocean.app/v1/api/verb'
             response = requests.get(external_api_url, headers={'token':
             '278ef2169b144e879aec4f48383dce28e654a009cacf46f8b6c03bbc9a4b9d11'}, json={'verb':
-            'habiter'})
+            data['verb']})
             if(response.status_code == 200):
                 return jsonify({"verb": response.json()})
             else:   
