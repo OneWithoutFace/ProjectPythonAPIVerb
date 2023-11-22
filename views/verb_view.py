@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
-from controllers.verb_controller import fetch_verb, fetch_random_verb, create_favorite_verb, get_favorite_verb, get_all_favorites
+from controllers.verb_controller import fetch_verb, fetch_random_verb, create_favorite_verb, get_favorite_verb, get_all_favorites, delete_favorite_verb
 
 verb = Blueprint("verb", __name__)
 
@@ -134,6 +134,25 @@ def get_favorites():
         return jsonify({'error': 'Something went wrong when fetching all favorite verbs.'}), 500
 
 # ENDPOINT 6 - DELETE A FAVORITE VERB BASED ON ID
-@verb.route("/verbs/favorites/<favoriteUid>", methods=["DELETE"])
+@verb.route("/verbs/favorites/<favoriteUid>/", methods=["DELETE"])
 def delete_favorite(favoriteUid):
-    pass
+    try:
+        token = validate_token()
+
+        if token == 400:
+            return jsonify({'error': "Token is missing in the request, please try again."}), 401
+        if token == 401:
+            return jsonify({'error': "Invalid authentication token, please login again."}), 403
+
+        favorite_id = delete_favorite_verb(favoriteUid)
+
+        if favorite_id == "Error":
+            return jsonify({'error': 'Verb not found.'}), 404
+        
+        return favorite_id
+
+    except Exception:
+        return jsonify({'error': 'Something went wrong when trying to delete the favorite.'}), 500
+
+
+

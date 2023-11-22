@@ -114,3 +114,19 @@ def get_all_favorites(userId):
     except Exception as err:
         return jsonify({'error': str(err)}), 400
 
+# THIS IS FOR THE SIXTH ENDPOINT
+def delete_favorite_verb(favoriteId):
+    try:
+        verb_id = ObjectId(favoriteId)
+
+        collection = database.dataBase[config.CONST_VERB_COLLECTION]
+
+        result = collection.delete_one({'_id': verb_id})
+
+        if result.deleted_count > 0:
+            return jsonify({'verbs_affected': result.deleted_count})
+        else:
+            return "Error"
+    
+    except Exception as err:
+        return jsonify({'error': str(err)}), 400
