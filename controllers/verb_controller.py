@@ -99,5 +99,18 @@ def get_favorite_verb(verbId):
     except Exception as e:
         return jsonify({'error': str(e)}), 400 
 
+# THIS IS FOR THE FIFTH ENDPOINT
+def get_all_favorites(userId):
+    try:
+        collection = database.dataBase[config.CONST_VERB_COLLECTION]
 
+        verbs = collection.find({"owner": userId}, {'_id': 0})
+
+        if not verbs:
+            return "No Favorites"
+
+        return list(verbs)
+
+    except Exception as err:
+        return jsonify({'error': str(err)}), 400
 
