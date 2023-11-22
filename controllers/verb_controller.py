@@ -1,4 +1,5 @@
 import requests
+from models.verb_model import Verb
 from database.__init__ import database
 import app_config as config
 import bcrypt
@@ -60,3 +61,21 @@ def fetch_random_verb(verbInformation):
     except Exception as err:
         print('Error: ', err)
     
+# THIS IS FOR THE THIRD ENDPOINT
+def create_favorite_verb(verbInformation, uid):
+    try:
+        fav_verb = Verb()
+        fav_verb.owner = uid
+        fav_verb.verb = verbInformation['verb']
+
+        collection = database.dataBase[config.CONST_VERB_COLLECTION]
+
+        if collection.find_one({'verb': fav_verb.verb}):
+            return "Duplicate Favorite"
+        
+        created_favorite = collection.insert_one(fav_verb.__dict__)
+
+        return created_favorite
+
+    except Exception as err:
+        print("Error when creating a new favorite verb: ", err)

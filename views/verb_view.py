@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
-from controllers.verb_controller import fetch_verb, fetch_random_verb
+from controllers.verb_controller import fetch_verb, fetch_random_verb, create_favorite_verb
 
 verb = Blueprint("verb", __name__)
 
@@ -63,7 +63,34 @@ def get_random_verb():
 # ENDPOINT 3 - ADD A FAVORITE VERB
 @verb.route("/verbs/favorites/", methods=["POST"])
 def add_favorite():
-    pass
+    try:
+        token = validate_token()
+
+        data = json.loads(request.data)
+
+        if token == 400:
+            return jsonify({'error': "Token is missing in the request, please try again."}), 401
+        if token == 401:
+            return jsonify({'error': "Invalid authentication token, please login again."}), 403
+        
+        if 'verb' not in data:
+            return jsonify({'error': 'Verb is needed in the request.'}), 400
+        
+        uid = token["uid"]
+
+        favorite_verb = create_favorite_verb(data, uid)
+
+        if favorite_verb == "Duplicate Favorite":
+            return jsonify({'error': 'This verb is already a favorite.'}), 400
+        
+        if not favorite_verb.inserted_id:
+            return jsonify({'error': 'Something happened when creating a new favorite verb'}), 500
+        
+        return jsonify({'id': str(favorite_verb.inserted_id)})
+        
+    except Exception:
+        return jsonify({'error': 'Something went wrong when trying to create a new favorite verb.'}), 500
+        
 
 # ENDPOINT 4 - GET A SINGLE FAVORITE VERB
 @verb.route("/verbs/favorites/<favoriteUid>/", methods=["GET"])
