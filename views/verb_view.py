@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
-from controllers.verb_controller import fetch_verb, fetch_random_verb, create_favorite_verb
+from controllers.verb_controller import fetch_verb, fetch_random_verb, create_favorite_verb, get_favorite_verb
 
 verb = Blueprint("verb", __name__)
 
@@ -95,7 +95,20 @@ def add_favorite():
 # ENDPOINT 4 - GET A SINGLE FAVORITE VERB
 @verb.route("/verbs/favorites/<favoriteUid>/", methods=["GET"])
 def get_single_favorite(favoriteUid):
-    pass
+    try:
+        token = validate_token()
+
+        if token == 400:
+            return jsonify({'error': "Token is missing in the request, please try again."}), 401
+        if token == 401:
+            return jsonify({'error': "Invalid authentication token, please login again."}), 403
+        
+        favorite = get_favorite_verb(favoriteUid)
+
+        return favorite
+    
+    except Exception:
+        return jsonify({'error': 'Something happened when getting the verb'}), 500
 
 # ENDPOINT 5 - GET ALL FAVORITE VERBS
 @verb.route("/verbs/favorites/", methods=["GET"])

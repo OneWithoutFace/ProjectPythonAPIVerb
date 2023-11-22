@@ -1,6 +1,7 @@
 import requests
 from models.verb_model import Verb
 from database.__init__ import database
+from bson.objectid import ObjectId
 import app_config as config
 import bcrypt
 import jwt
@@ -79,3 +80,24 @@ def create_favorite_verb(verbInformation, uid):
 
     except Exception as err:
         print("Error when creating a new favorite verb: ", err)
+
+# THIS IS FOR THE FOURTH ENDPOINT
+def get_favorite_verb(verbId):
+    try:
+        verb_id = ObjectId(verbId)
+
+        collection = database.dataBase[config.CONST_VERB_COLLECTION]
+
+        result = collection.find_one({'_id': verb_id})
+
+        if result:
+            result['_id'] = str(result['_id'])
+            return jsonify(result)
+        else:
+            return jsonify({'error': 'Verb not found'}), 404
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400 
+
+
+
