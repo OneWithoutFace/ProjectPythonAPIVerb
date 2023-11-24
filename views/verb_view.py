@@ -1,8 +1,8 @@
-import requests
+
 from flask import Blueprint, request, jsonify
 import json
 from helpers.token_validation import validate_token
-from controllers.user_controller import get_verb, random_verb
+from controllers.verb_controller import get_verb, random_verb
 
 verb = Blueprint("verb", __name__)
 
